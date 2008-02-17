@@ -1,0 +1,24 @@
+For hmac:
+* Support hashing using keys larger than the base block size of the hash
+* Trap more errors to make sure things die loudly.
+
+For s3:
+* Do some sort of "real" XML parsing instead of the ugly hackjobs currently
+  used.
+* More xml encoding escapes. 
+* Better dependency checking.  I rely on alot of GNUisms, but there just
+  does not seem to be a really portable way of finding a file size. :(
+  This would involve matching revisions of utilities as well as their 
+  presence.
+* x-amz-whatever headers.  Currently, signature generation supports including
+  them, and curl_headers can be used to portably generate them, but there
+  is no method of actually introducing them into the HTML bitstream.
+* Support for just passing the S3 url instead of having the tool construct one.
+  I don't need it, and I think that writing a URI parser for a short shell
+  script is Too Much Work, but someone probably thinks it is interesting.
+* HEAD variants of s3_list and s3_bucket.  Because sometimes all we really
+  want are the headers.
+
+For both:
+* Figure out the earliest version of bash that offers all the bashisms we 
+  rely on, and code the scripts to die loudly of we don't have it.

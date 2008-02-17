@@ -1,0 +1,35 @@
+NOTE: THIS LOCATION IS UNMAINTANED -- I HAVE SWITCHED TO USING GIT.
+
+Current code @ git://fnordovax.org/another-s3-bash/ or
+http://git.fnordovax.org/another-s3-bash/
+
+Implement scripts for perfoming basic file manupulation on Amazon S3.
+
+s3 -- basic S3 functionality.  Implements the following commands:
+  put: put a file onto S3
+  get: copy a file from S3
+  list: list the contents of an S3 bucket
+  buckets: list buckets
+  rm: remove a file from S3
+  rmrf: remove all files from a bucket on S3
+
+All commands follow the same format:
+  s3 cmd bucket remote_name local_name (if different from remote_name)
+You will need two environment variables set:
+  S3_ACCESS_KEY_ID: your S3 access key id.
+  S3_SECRET_ACCESS_KEY: the name of the file that contains your S3 secret key.
+
+s3 only prints diagnostics if prerequisites are not met, 
+so check the shell return codes.
+
+
+hmac -- calculate an hmac.  Used by s3.
+Call it like so:
+  hmac hash keyfile file
+
+The hash will be printed in binary form to stdout.  
+If file is missing, hmac will hash whatever is input on stdin.
+
+
+There are several things which are incomplete, missing, or flat-out wrong.
+Send patches to victor.lowther@gmail.com if you fix something!
