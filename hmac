@@ -2,6 +2,7 @@
 # Implement HMAC functionality on top of the OpenSSL digest functions.
 # licensed under the terms of the GNU GPL v2
 # Copyright 2007 Victor Lowther <victor.lowther@gmail.com>
+set -o pipefail
 
 die() {
   echo $*
