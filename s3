@@ -2,8 +2,7 @@
 # basic amazon s3 operations
 # Licensed under the terms of the GNU GPL v2
 # Copyright 2007 Victor Lowther <victor.lowther@gmail.com>
-
-
+set -o pipefail
 
 # print a message and bail
 die() {
@@ -147,9 +146,8 @@ s3_curl() {
   headers[${#headers[@]}]="Authorization: AWS ${S3_ACCESS_KEY_ID}:${sig}"
   headers[${#headers[@]}]="Date: ${date}"
   [[ ${md5} ]] && headers[${#headers[@]}]="Content-MD5: ${md5}"
-    curl ${arg} "${inout}" ${stdopts} -K <(curl_headers "${headers[@]}") \
-       "http://s3.amazonaws.com${bucket}${remote}"
-  return $?
+  curl ${arg} "${inout}" ${stdopts} -K <(curl_headers "${headers[@]}") \
+    "http://s3.amazonaws.com${bucket}${remote}"
 }
 
 s3_put() {
@@ -157,7 +155,6 @@ s3_put() {
   # $2 = remote name to put
   # $3 = file to put.  This must be present if $2 is.
   s3_curl PUT "${1}" "${2}" "${3:-${2}}"
-  return $?
 } 
 
 s3_get() {
@@ -166,19 +163,16 @@ s3_get() {
   # $3 = local file to get into. Will be overwritten if it exists.
   #      If this contains a path, that path must exist before calling this.
   s3_curl GET "${1}" "${2}" "${3:-${2}}"
-  return $?
 }
 
 s3_test() {
   # same args as s3_get, but uses the HEAD verb instead of the GET verb.
   s3_curl HEAD "${1}" "${2}" >/dev/null 
-  return $?
 }
 
 # Hideously ugly, but it works well enough.
 s3_buckets() {
   s3_get |grep -o '<Name>[^>]*</Name>' |sed 's/<[^>]*>//g' |xmldec
-  return $?
 }
   
 # this will only return the first thousand entries, alas
@@ -186,36 +180,36 @@ s3_buckets() {
 # Also need to add xml entity handling.
 s3_list() {
   # $1 = bucket to list
-  [ "x${1}" == "x" ] && return 1
+  [[ ${1} ]] || return 1
   s3_get "${1}" |grep -o '<Key>[^>]*</Key>' |sed 's/<[^>]*>//g'| xmldec
-  return $?
 }
 
 s3_delete() {
   # $1 = bucket to delete from
   # $2 = item to delete
   s3_curl DELETE "${1}" "${2}"
-  return $?
 }
 
 # because this uses s3_list, it suffers from the same flaws.
 s3_rmrf() {
   # $1 = bucket to delete everything from
-  s3_list "${1}" | while read f; do 
+  s3_list "${1}" | while read -r f; do 
     s3_delete "${1}" "${f}"; 
   done
 }
 
 check_deps
-case $1 in
-  put) shift; s3_put "$@" ;;
-  get) shift; s3_get "$@" ;;
-  rm) shift; s3_delete "$@" ;;
-  ls) shift; s3_list "$@" ;;
-  test) shift; s3_test "$@" ;;
+cmd="$1"
+shift
+case $cmd in
+  put) s3_put "$@" ;;
+  get) s3_get "$@" ;;
+  rm) s3_delete "$@" ;;
+  ls) s3_list "$@" ;;
+  test) s3_test "$@" ;;
   buckets) s3_buckets ;;
-  rmrf) shift; s3_rmrf "$@" ;;
-  *) die "Unknown command ${1}."
+  rmrf) s3_rmrf "$@" ;;
+  *) die "Unknown command ${cmd}."
     ;;
 esac
 
