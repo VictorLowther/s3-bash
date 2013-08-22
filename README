@@ -1,8 +1,3 @@
-NOTE: THIS LOCATION IS UNMAINTANED -- I HAVE SWITCHED TO USING GIT.
-
-Current code @ git://fnordovax.org/another-s3-bash/ or
-http://git.fnordovax.org/another-s3-bash/
-
 Implement scripts for perfoming basic file manupulation on Amazon S3.
 
 s3 -- basic S3 functionality.  Implements the following commands:
